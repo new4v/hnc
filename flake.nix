@@ -7,43 +7,77 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  outputs = inputs@{ nixpkgs, home-manager, nixos-hardware, ... }:
     let
-      # Import all host definitions
-      hosts = import ./hosts { inherit inputs; };
+      lib = nixpkgs.lib;
 
-      # Helper: build a nixosConfiguration from a host definition
-      mkHost = name: hostCfg: nixpkgs.lib.nixosSystem {
-        system = hostCfg.system;
-        specialArgs = {
-          inherit inputs;
-          hostMeta = hostCfg;
-        };
-        modules = [
-          ./modules/core.nix
-          ./modules/users.nix
-          ./modules/system-types
-
-          # Host-specific config (hardware-configuration, overrides)
-          hostCfg.nixosModule
-
-          # Home-manager as NixOS module
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = {
-              inherit inputs;
-              hostMeta = hostCfg;
-            };
-            home-manager.users.${hostCfg.username} = import ./home;
-          }
-        ];
+      mkHost = { system, modules }: lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs nixos-hardware; };
+        modules = modules;
       };
+
+      mkHome = username: hmConfigPath: [
+        home-manager.nixosModules.home-manager
+        {
+          home-manager = {
+            extraSpecialArgs = { inherit inputs; };
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            users.${username} = {
+              imports = [ hmConfigPath ];
+              home.username = username;
+              home.homeDirectory = "/home/${username}";
+            };
+          };
+        }
+      ];
     in
     {
-      nixosConfigurations = builtins.mapAttrs mkHost hosts;
+      nixosConfigurations = {
+        # ── Physical machine ────────────────────────────────────
+        mythbox = mkHost {
+          system = "x86_64-linux";
+          modules = [
+            ./hosts/mythbox
+            ./modules/core.nix
+            (import ./modules/users.nix "alice")
+            ./profiles/physical.nix
+          ] ++ mkHome "alice" ./home;
+        };
+
+        # ── Virtual machine ─────────────────────────────────────
+        myvm = mkHost {
+          system = "x86_64-linux";
+          modules = [
+            ./hosts/myvm
+            ./modules/core.nix
+            (import ./modules/users.nix "alice")
+            ./profiles/vm.nix
+          ] ++ mkHome "alice" ./home;
+        };
+
+        # ── Live USB ────────────────────────────────────────────
+        live = mkHost {
+          system = "x86_64-linux";
+          modules = [
+            ./hosts/live
+            ./modules/core.nix
+            (import ./modules/users.nix "nixos")
+            ./profiles/live-usb.nix
+          ] ++ mkHome "nixos" ./home;
+        };
+      };
+
+      # Reusable NixOS modules
+      nixosModules = {
+        physical = import ./profiles/physical.nix;
+        vm = import ./profiles/vm.nix;
+        live-usb = import ./profiles/live-usb.nix;
+        core = import ./modules/core.nix;
+      };
     };
 }

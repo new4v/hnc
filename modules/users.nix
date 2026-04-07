@@ -1,7 +1,11 @@
-{ hostMeta, pkgs, ... }:
+# Usage: import ./users.nix "username"
+# Returns a NixOS module that creates the given user account.
+username:
+
+{ pkgs, ... }:
 
 {
-  users.users.${hostMeta.username} = {
+  users.users.${username} = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" ];
     shell = pkgs.bash;

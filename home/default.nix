@@ -1,4 +1,4 @@
-{ hostMeta, lib, ... }:
+{ config, lib, ... }:
 
 {
   imports = [
@@ -7,8 +7,8 @@
     ./packages.nix
   ];
 
-  home.username = hostMeta.username;
-  home.homeDirectory = "/home/${hostMeta.username}";
+  # username and homeDirectory are set per-user via mkHome in flake.nix
+  # Override these in a host-specific home module if needed.
   home.stateVersion = "24.11";
 
   programs.home-manager.enable = true;

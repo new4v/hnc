@@ -1,17 +1,10 @@
-{ inputs, ... }:
+{ ... }:
 
 {
-  # ── Host variables ──────────────────────────────────────────────
-  hostname   = "myvm";
-  username   = "alice";              # change to your username
-  system     = "x86_64-linux";
-  systemType = "vm";                 # physical | vm | live-usb
+  imports = [ ./hardware-configuration.nix ];
 
-  # ── Host-specific NixOS module ──────────────────────────────────
-  nixosModule = { ... }: {
-    imports = [ ./hardware-configuration.nix ];
+  networking.hostName = "myvm";
 
-    # Put host-specific overrides here, e.g.:
-    # services.openssh.enable = true;
-  };
+  # Host-specific overrides go here, e.g.:
+  # services.openssh.enable = true;
 }

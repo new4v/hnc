@@ -1,18 +1,11 @@
-{ inputs, ... }:
+{ modulesPath, ... }:
 
 {
-  # ── Host variables ──────────────────────────────────────────────
-  hostname   = "nixos-live";
-  username   = "nixos";
-  system     = "x86_64-linux";
-  systemType = "live-usb";           # physical | vm | live-usb
+  imports = [
+    (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
+  ];
 
-  # ── Host-specific NixOS module ──────────────────────────────────
-  nixosModule = { modulesPath, ... }: {
-    imports = [
-      (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
-    ];
+  networking.hostName = "nixos-live";
 
-    # Put live-USB-specific overrides here
-  };
+  # Live-USB-specific overrides go here
 }

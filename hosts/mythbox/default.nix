@@ -1,18 +1,11 @@
-{ inputs, ... }:
+{ ... }:
 
 {
-  # ── Host variables ──────────────────────────────────────────────
-  hostname   = "mythbox";
-  username   = "alice";              # change to your username
-  system     = "x86_64-linux";
-  systemType = "physical";           # physical | vm | live-usb
+  imports = [ ./hardware-configuration.nix ];
 
-  # ── Host-specific NixOS module ──────────────────────────────────
-  nixosModule = { ... }: {
-    imports = [ ./hardware-configuration.nix ];
+  networking.hostName = "mythbox";
 
-    # Put host-specific overrides here, e.g.:
-    # time.timeZone = "America/New_York";
-    # services.xserver.enable = true;
-  };
+  # Host-specific overrides go here, e.g.:
+  # time.timeZone = "America/New_York";
+  # services.xserver.enable = true;
 }
