@@ -1,5 +1,5 @@
 {
-  description = "NixOS configuration";
+  description = "NixOS configuration with home-manager and disko";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -8,15 +8,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs@{ nixpkgs, home-manager, nixos-hardware, ... }:
+  outputs = inputs@{ nixpkgs, home-manager, nixos-hardware, disko, ... }:
     let
       lib = nixpkgs.lib;
 
       mkHost = { system, modules }: lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs nixos-hardware; };
+        specialArgs = { inherit inputs nixos-hardware disko; };
         modules = modules;
       };
 
@@ -69,6 +73,31 @@
             (import ./modules/users.nix "nixos")
             ./profiles/live-usb.nix
           ] ++ mkHome "nixos" ./home;
+        };
+
+        # ── Disko configurations ────────────────────────────────
+        server = mkHost {
+          system = "x86_64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/server
+          ];
+        };
+
+        desktop = mkHost {
+          system = "x86_64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/desktop
+          ];
+        };
+
+        laptop = mkHost {
+          system = "x86_64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/laptop
+          ];
         };
       };
 
