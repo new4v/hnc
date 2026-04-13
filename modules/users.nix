@@ -7,8 +7,8 @@ username:
 {
   users.users.${username} = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
-    shell = pkgs.bash;
+    extraGroups = [ "wheel" "networkmanager" "input" "video" ];
+    shell = pkgs.zsh;
     # Replace with hashedPassword or remove for key-only auth
     initialPassword = "changeme";
   };
