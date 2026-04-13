@@ -3,8 +3,9 @@
 {
   imports = [
     ./shell.nix
-    ./git.nix
-    ./packages.nix
+    ./desktop.nix
+    ./editors.nix
+    ./dev.nix
     ./config.nix
   ];
 
