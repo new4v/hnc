@@ -1,6 +1,13 @@
 {
   description = "NixOS configuration with home-manager and disko";
 
+  nixConfig = {
+    extra-substituters      = [ "https://niri.cachix.org" ];
+    extra-trusted-public-keys = [
+      "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
@@ -10,6 +17,14 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     disko = {
       url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    niri-flake = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -32,7 +47,11 @@
             useGlobalPkgs = true;
             useUserPackages = true;
             users.${username} = {
-              imports = [ hmConfigPath ];
+              imports = [
+                hmConfigPath
+                inputs.niri-flake.homeModules.config   # programs.niri.settings
+                inputs.noctalia.homeModules.default    # programs.noctalia
+              ];
               home.username = username;
               home.homeDirectory = "/home/${username}";
             };
@@ -42,18 +61,20 @@
     in
     {
       nixosConfigurations = {
-        # ── Physical machine ────────────────────────────────────
+        # ── Physical machine ────────────────────────────────────────
         mythbox = mkHost {
           system = "x86_64-linux";
           modules = [
             ./hosts/mythbox
             ./modules/core.nix
+            ./modules/keyd.nix
             (import ./modules/users.nix "alice")
             ./profiles/physical.nix
+            inputs.niri-flake.nixosModules.niri   # niri pkg + xdg-portal-gnome
           ] ++ mkHome "alice" ./home;
         };
 
-        # ── Virtual machine ─────────────────────────────────────
+        # ── Virtual machine ─────────────────────────────────────────
         myvm = mkHost {
           system = "x86_64-linux";
           modules = [
@@ -64,7 +85,7 @@
           ] ++ mkHome "alice" ./home;
         };
 
-        # ── Live USB ────────────────────────────────────────────
+        # ── Live USB ────────────────────────────────────────────────
         live = mkHost {
           system = "x86_64-linux";
           modules = [
@@ -75,7 +96,7 @@
           ] ++ mkHome "nixos" ./home;
         };
 
-        # ── Disko configurations ────────────────────────────────
+        # ── Disko configurations ────────────────────────────────────
         server = mkHost {
           system = "x86_64-linux";
           modules = [
@@ -104,9 +125,10 @@
       # Reusable NixOS modules
       nixosModules = {
         physical = import ./profiles/physical.nix;
-        vm = import ./profiles/vm.nix;
+        vm       = import ./profiles/vm.nix;
         live-usb = import ./profiles/live-usb.nix;
-        core = import ./modules/core.nix;
+        core     = import ./modules/core.nix;
+        keyd     = import ./modules/keyd.nix;
       };
     };
 }

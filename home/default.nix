@@ -3,8 +3,9 @@
 {
   imports = [
     ./shell.nix
-    ./git.nix
-    ./packages.nix
+    ./desktop.nix
+    ./editors.nix
+    ./dev.nix
   ];
 
   # username and homeDirectory are set per-user via mkHome in flake.nix
