@@ -5,6 +5,7 @@
     ./shell.nix
     ./git.nix
     ./packages.nix
+    ./config.nix
   ];
 
   # username and homeDirectory are set per-user via mkHome in flake.nix
