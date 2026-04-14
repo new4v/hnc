@@ -27,6 +27,14 @@
       url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    palefox = {
+      url = "github:tompassarelli/palefox";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nur = {
+      url = "github:nix-community/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs@{ nixpkgs, home-manager, nixos-hardware, disko, ... }:
@@ -41,6 +49,8 @@
 
       mkHome = username: hmConfigPath: [
         home-manager.nixosModules.home-manager
+        # NUR overlay – required by palefox to install Sideberry from NUR
+        { nixpkgs.overlays = [ inputs.nur.overlays.default ]; }
         {
           home-manager = {
             extraSpecialArgs = { inherit inputs; };
@@ -49,8 +59,9 @@
             users.${username} = {
               imports = [
                 hmConfigPath
-                inputs.niri-flake.homeModules.config   # programs.niri.settings
-                inputs.noctalia.homeModules.default    # programs.noctalia
+                inputs.niri-flake.homeModules.config        # programs.niri.settings
+                inputs.noctalia.homeModules.default         # programs.noctalia
+                inputs.palefox.homeManagerModules.default   # programs.palefox
               ];
               home.username = username;
               home.homeDirectory = "/home/${username}";

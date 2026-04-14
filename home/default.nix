@@ -7,6 +7,7 @@
     ./editors.nix
     ./dev.nix
     ./config.nix
+    ./browsers.nix
   ];
 
   # username and homeDirectory are set per-user via mkHome in flake.nix
