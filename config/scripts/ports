@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Show all listening TCP and UDP ports with the owning process.
+set -euo pipefail
+
+echo "── Listening TCP ──────────────────────────"
+ss -tlnp
+
+echo ""
+echo "── Listening UDP ──────────────────────────"
+ss -ulnp

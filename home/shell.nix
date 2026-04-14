@@ -18,13 +18,43 @@
       ll  = "eza -la --icons --git";
       la  = "eza -la --icons";
       cat = "bat";
+
+      # Safe defaults for destructive operations
+      cp    = "cp -iv";
+      mv    = "mv -iv";
+      rm    = "rm -iv";
+      mkdir = "mkdir -pv";
+
+      # Coloured grep
+      grep  = "grep --color=auto";
+      egrep = "egrep --color=auto";
+
+      # Quick navigation
+      ".."  = "cd ..";
+      "..." = "cd ../..";
+
+      # Git shortcuts
       gs  = "git status";
       gd  = "git diff";
+      gl  = "git log --oneline --graph --decorate";
+      gp  = "git push";
+      gc  = "git commit";
+      ga  = "git add";
+      gco = "git checkout";
     };
     initExtra = ''
       # zoxide replaces cd (use plain `cd` to jump; `cdi` for interactive)
       eval "$(zoxide init zsh --cmd cd)"
     '';
+  };
+
+  # ── Session variables ────────────────────────────────────────────────────────
+  home.sessionVariables = {
+    PAGER    = "less";
+    # bat-rendered man pages (col strips backspace-overstrike before bat sees it)
+    MANPAGER = "sh -c 'col -bx | bat -l man -p'";
+    # -R: ANSI passthrough  --use-color: bold/underline  -i: smart-case search
+    LESS     = "-R --use-color -Dd+r$Du+b -i";
   };
 
   # ── Starship prompt ──────────────────────────────────────────────────────────

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Update all flake inputs then rebuild.
+set -euo pipefail
+echo "==> nix flake update ~/hnc"
+nix flake update ~/hnc
+exec rebuild "$@"

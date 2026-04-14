@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Quick system summary: OS, kernel, uptime, memory, disk, CPU.
+# Uses only tools available in every NixOS base system.
+set -euo pipefail
+
+echo "── NixOS ──────────────────────────────────"
+nixos-version 2>/dev/null || true
+uname -r
+
+echo ""
+echo "── Uptime ─────────────────────────────────"
+uptime -p
+
+echo ""
+echo "── Memory ─────────────────────────────────"
+free -h
+
+echo ""
+echo "── Disk ───────────────────────────────────"
+df -h / /boot 2>/dev/null | column -t
+
+echo ""
+echo "── CPU ────────────────────────────────────"
+grep "model name" /proc/cpuinfo | head -1 | cut -d: -f2 | xargs
+echo "$(nproc) logical CPUs"

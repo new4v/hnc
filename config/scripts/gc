@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Garbage-collect system and user Nix profiles, then deduplicate the store.
+set -euo pipefail
+echo "==> sudo nix-collect-garbage -d  (system profiles)"
+sudo nix-collect-garbage -d
+echo "==> nix-collect-garbage -d  (user profiles)"
+nix-collect-garbage -d
+echo "==> nix store optimise"
+nix store optimise

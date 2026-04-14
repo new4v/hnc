@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Rebuild NixOS from the hnc flake.
+# Extra flags (e.g. --show-trace, --verbose) are forwarded via "$@".
+set -euo pipefail
+echo "==> nixos-rebuild switch --flake ~/hnc"
+sudo nixos-rebuild switch --flake ~/hnc "$@"

@@ -63,5 +63,34 @@
     eza       # modern ls with icons and git status
     unzip
     tree
+    btop         # rich TUI system/process monitor (CPU, mem, disk, net, GPU)
+    wl-clipboard # wl-copy / wl-paste for Wayland clipboard in scripts & helix
+    hyperfine    # accurate command benchmarking
   ];
+
+  # ── SSH ──────────────────────────────────────────────────────────────────────
+  # ControlMaster multiplexing: subsequent connections to the same host reuse
+  # the existing socket, so git push/pull to remote servers is near-instant
+  # after the first connection.
+  programs.ssh = {
+    enable              = true;
+    addKeysToAgent      = "yes";
+    compression         = true;
+    serverAliveInterval = 60;
+    serverAliveCountMax = 3;
+    extraConfig = ''
+      Host *
+        ControlMaster   auto
+        ControlPath     ~/.ssh/control/%r@%h:%p
+        ControlPersist  10m
+    '';
+  };
+
+  # ── man ──────────────────────────────────────────────────────────────────────
+  # generateCaches builds the whatis/apropos database so `man -k keyword` works
+  # immediately. Rendering is handled by MANPAGER (bat) set in shell.nix.
+  programs.man = {
+    enable         = true;
+    generateCaches = true;
+  };
 }
