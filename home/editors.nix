@@ -79,6 +79,19 @@
   # Cursor syncs VS Code settings on first launch; the vscode settings above apply.
   home.packages = [ pkgs.code-cursor ];
 
+  # ── Emacs (TUI: emacs -nw  |  GUI: emacs on Wayland) ────────────────────────────
+  programs.emacs = {
+    enable  = true;
+    package = pkgs.emacs-pgtk;           # pure-GTK: Wayland GUI + TUI (-nw)
+    extraPackages = epkgs: [ epkgs.which-key ];
+
+    # Thin loader only — real config lives in config/emacs/init.el (live-editable).
+    # Edit that file and restart Emacs; no rebuild required.
+    extraConfig = ''
+      (load (expand-file-name "~/hnc/config/emacs/init.el") nil :nomessage)
+    '';
+  };
+
   # ── LSP / formatter helpers used by editors ───────────────────────────────────
   home.packages = [
     pkgs.nil       # Nix language server (used by Helix + VS Code Nix extension)
