@@ -72,72 +72,24 @@
     in
     {
       nixosConfigurations = {
-        # ── Physical machine ────────────────────────────────────────
-        mythbox = mkHost {
+        # ── ThinkPad E16 (daily driver) ─────────────────────────────
+        thinkpad-e16 = mkHost {
           system = "x86_64-linux";
           modules = [
-            ./hosts/mythbox
+            disko.nixosModules.disko
+            ./hardware/thinkpad-e16.nix
             ./modules/core.nix
             ./modules/keyd.nix
             (import ./modules/users.nix "alice")
-            ./profiles/physical.nix
+            ./modules/physical.nix
             inputs.niri-flake.nixosModules.niri   # niri pkg + xdg-portal-gnome
           ] ++ mkHome "alice" ./home;
-        };
-
-        # ── Virtual machine ─────────────────────────────────────────
-        myvm = mkHost {
-          system = "x86_64-linux";
-          modules = [
-            ./hosts/myvm
-            ./modules/core.nix
-            (import ./modules/users.nix "alice")
-            ./profiles/vm.nix
-          ] ++ mkHome "alice" ./home;
-        };
-
-        # ── Live USB ────────────────────────────────────────────────
-        live = mkHost {
-          system = "x86_64-linux";
-          modules = [
-            ./hosts/live
-            ./modules/core.nix
-            (import ./modules/users.nix "nixos")
-            ./profiles/live-usb.nix
-          ] ++ mkHome "nixos" ./home;
-        };
-
-        # ── Disko configurations ────────────────────────────────────
-        server = mkHost {
-          system = "x86_64-linux";
-          modules = [
-            disko.nixosModules.disko
-            ./hosts/server
-          ];
-        };
-
-        desktop = mkHost {
-          system = "x86_64-linux";
-          modules = [
-            disko.nixosModules.disko
-            ./hosts/desktop
-          ];
-        };
-
-        laptop = mkHost {
-          system = "x86_64-linux";
-          modules = [
-            disko.nixosModules.disko
-            ./hosts/laptop
-          ];
         };
       };
 
       # Reusable NixOS modules
       nixosModules = {
-        physical = import ./profiles/physical.nix;
-        vm       = import ./profiles/vm.nix;
-        live-usb = import ./profiles/live-usb.nix;
+        physical = import ./modules/physical.nix;
         core     = import ./modules/core.nix;
         keyd     = import ./modules/keyd.nix;
       };
