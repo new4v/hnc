@@ -92,6 +92,7 @@
         physical = import ./modules/physical.nix;
         core     = import ./modules/core.nix;
         keyd     = import ./modules/keyd.nix;
+        virt     = import ./modules/virt.nix;
       };
     };
 }
