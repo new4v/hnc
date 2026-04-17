@@ -89,7 +89,7 @@
             inputs.my-modules.nixosModules.keyd
             { profiles.keyd.enable = true; }
             (import ./modules/users.nix "alice")
-            inputs.niri-flake.nixosModules.niri   # niri pkg + xdg-portal-gnome
+            ./modules/desktop/niri.nix   # niri pkg + portal + polkit + Wayland env
           ] ++ mkHome "alice" ./home;
         };
       };

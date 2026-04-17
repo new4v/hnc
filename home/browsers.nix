@@ -1,6 +1,8 @@
-{ pkgs, lib, inputs, ... }:
+{ pkgs, lib, inputs, config, ... }:
 
 let
+  repo = "${config.home.homeDirectory}/hnc";
+
   # ChatGPTBox XPI built in the modules repo (packages/chatgptbox.nix).
   # After the first build, confirm the real extension ID with:
   #   unzip -p ${chatgptboxXpi} manifest.json | jq '.browser_specific_settings.gecko.id'
@@ -130,6 +132,12 @@ in
       };
     };
   };
+
+  # ── Tridactyl dotfile ────────────────────────────────────────────────────────
+  # Tridactyl reads ~/.config/tridactyl/tridactylrc (XDG path on Linux).
+  # Symlinked to the live file in the repo; edit and reload (:source) instantly.
+  home.file.".config/tridactyl/tridactylrc".source =
+    config.lib.file.mkOutOfStoreSymlink "${repo}/config/tridactyl/tridactylrc";
 
   # ── Chromium ─────────────────────────────────────────────────────────────────
   programs.chromium = {

@@ -1,0 +1,39 @@
+theme = "catppuccin_mocha"
+
+[editor]
+line-number = "relative"
+cursorline = true
+color-modes = true
+auto-pairs = true
+completion-trigger-len = 2
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.indent-guides]
+render = true
+character = "╎"
+
+[editor.lsp]
+display-inlay-hints = true
+display-messages = true
+
+[editor.statusline]
+left   = ["mode", "spinner", "file-name", "file-modification-indicator"]
+center = ["version-control"]
+right  = ["diagnostics", "selections", "position", "file-encoding"]
+
+[keys.normal]
+"C-s"   = ":write"
+
+[keys.normal.space]
+"f" = ":format"
+
+[keys.normal."C-w"]
+"v" = "vsplit"
+"s" = "hsplit"
+
+[keys.insert]
+"C-s" = [":write", "normal_mode"]
