@@ -1,48 +1,11 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, inputs, ... }:
 
 let
-  # ── Build ChatGPTBox Firefox extension from source ────────────────────────────
-  # Source: https://github.com/aaaAlexanderaaa/chatGPTBox
-  # Build: npm ci && npm run build  →  build/*.zip
-  #
-  # On first build, Nix will error with the correct sha256 — replace lib.fakeHash.
-  # To find the real hash manually:
-  #   nix-prefetch-url --unpack https://github.com/aaaAlexanderaaa/chatGPTBox/archive/<rev>.tar.gz
-  #
-  # After a successful build, confirm the extension ID with:
+  # ChatGPTBox XPI built in the modules repo (packages/chatgptbox.nix).
+  # After the first build, confirm the real extension ID with:
   #   unzip -p ${chatgptboxXpi} manifest.json | jq '.browser_specific_settings.gecko.id'
   # Replace "chatgptbox@local" in ExtensionSettings with that value.
-  chatgptboxXpi = pkgs.stdenv.mkDerivation {
-    pname   = "chatgptbox-firefox";
-    version = "unstable";
-
-    src = pkgs.fetchFromGitHub {
-      owner  = "aaaAlexanderaaa";
-      repo   = "chatGPTBox";
-      rev    = "main";       # pin to a specific commit hash for reproducibility
-      sha256 = lib.fakeHash; # replace after first build failure prints the real hash
-    };
-
-    nativeBuildInputs = with pkgs; [ nodejs_20 nodePackages.npm zip ];
-
-    buildPhase = ''
-      export HOME=$TMPDIR
-      npm ci
-      npm run build
-    '';
-
-    # npm run build → build/*.zip; grab the Firefox-specific zip
-    installPhase = ''
-      firefox_zip=$(ls build/firefox-*.zip build/*firefox*.zip 2>/dev/null | head -1)
-      if [ -z "$firefox_zip" ]; then
-        firefox_zip=$(ls build/*.zip | head -1)
-      fi
-      cp "$firefox_zip" "$out"
-    '';
-  };
-
-  # ── AMO extension URL helper ──────────────────────────────────────────────────
-  moz = short: "https://addons.mozilla.org/firefox/downloads/latest/${short}/latest.xpi";
+  chatgptboxXpi = inputs.my-modules.packages.${pkgs.system}.chatgptbox;
 
 in
 {
@@ -76,7 +39,7 @@ in
       in {
         "*".installation_mode = "blocked"; # deny anything not explicitly listed
 
-        # ChatGPTBox – built from GitHub source above
+        # ChatGPTBox – built from GitHub source (packages/chatgptbox.nix in modules repo)
         # TODO: replace key with real ID from:
         #   unzip -p ${chatgptboxXpi} manifest.json | jq '.browser_specific_settings.gecko.id'
         "chatgptbox@local" = {

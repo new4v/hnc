@@ -1,11 +1,11 @@
-{ config, lib, ... }:
+{ inputs, ... }:
 
 {
   imports = [
-    ./shell.nix
+    inputs.my-modules.homeManagerModules.dev
+    inputs.my-modules.homeManagerModules.shell
     ./desktop.nix
     ./editors.nix
-    ./dev.nix
     ./config.nix
     ./browsers.nix
   ];
