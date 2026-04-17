@@ -1,18 +1,20 @@
-{ config, lib, ... }:
+{ ... }:
 
 {
   imports = [
-    ./shell.nix
-    ./desktop.nix
-    ./editors.nix
-    ./dev.nix
-    ./config.nix
+    ./core.nix          # session vars, XDG, fonts
+    ./shell             # ZSH + starship + git + tmux + tools (shell/default.nix)
+    ./desktop/niri.nix
+    ./desktop/noctila.nix
+    ./desktop/waybar.nix
+    ./desktop/theme.nix
+    ./editors/emacs.nix
+    ./editors/helix.nix
+    ./editors/vscode.nix
     ./browsers.nix
+    ./dev.nix
   ];
 
-  # username and homeDirectory are set per-user via mkHome in flake.nix
-  # Override these in a host-specific home module if needed.
   home.stateVersion = "24.11";
-
   programs.home-manager.enable = true;
 }

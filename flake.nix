@@ -35,6 +35,12 @@
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Shared modules & packages repo.
+    # Local path for development; change to "github:user/nixos-modules" after pushing.
+    my-modules = {
+      url = "path:/home/user/nixos-modules";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs@{ nixpkgs, home-manager, nixos-hardware, disko, ... }:
@@ -78,20 +84,14 @@
           modules = [
             disko.nixosModules.disko
             ./hardware/thinkpad-e16.nix
-            ./modules/core.nix
-            ./modules/keyd.nix
+            inputs.my-modules.nixosModules.core
+            inputs.my-modules.nixosModules.physical
+            inputs.my-modules.nixosModules.keyd
+            { profiles.keyd.enable = true; }
             (import ./modules/users.nix "alice")
-            ./modules/physical.nix
-            inputs.niri-flake.nixosModules.niri   # niri pkg + xdg-portal-gnome
+            ./modules/desktop/niri.nix   # niri pkg + portal + polkit + Wayland env
           ] ++ mkHome "alice" ./home;
         };
-      };
-
-      # Reusable NixOS modules
-      nixosModules = {
-        physical = import ./modules/physical.nix;
-        core     = import ./modules/core.nix;
-        keyd     = import ./modules/keyd.nix;
       };
     };
 }
